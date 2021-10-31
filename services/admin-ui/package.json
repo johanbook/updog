@@ -1,0 +1,75 @@
+{
+  "name": "admin-ui",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write '{scripts,src}/**/*.{js,jsx,ts,tsx}'",
+    "lint": "tsc && eslint '{scripts,src}/**/*.{js,jsx,ts,tsx}' --max-warnings 0",
+    "dev": "react-scripts start",
+    "start": "serve -s build",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:ci": "CI=true react-scripts test",
+    "test:coverage": "CI=true npm run test -- --coverage"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "index.ts",
+      "reportWebVitals.ts",
+      "setupProxy.js",
+      "test"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    },
+    "resetMocks": false
+  },
+  "dependencies": {
+    "@emotion/styled": "^11.3.0",
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/node": "^12.20.24",
+    "@types/react": "^17.0.20",
+    "@types/react-dom": "^17.0.9",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "serve": "^12.0.1",
+    "typescript": "^4.4.3",
+    "web-vitals": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest-canvas-mock": "^2.3.1",
+    "jest-fetch-mock": "^3.0.3",
+    "notistack": "^2.0.3",
+    "react-query": "^3.31.0"
+  }
+}

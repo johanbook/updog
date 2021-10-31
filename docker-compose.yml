@@ -1,0 +1,76 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: "password"
+
+  traefik:
+    image: "traefik:v2.4"
+    container_name: "traefik"
+    command:
+      # Exposes Dashboard
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+
+        # Traefik Dashboard
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  api:
+    build: "./services/api"
+    labels:
+      - "traefik.enable=true"
+
+      # Verify authentication
+      - "traefik.http.middlewares.auth.forwardauth.address=http://authentication:80"
+      - "traefik.http.middlewares.auth.forwardauth.authResponseHeaders=x-user-id"
+
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+
+      # Target router
+      - "traefik.http.routers.api.rule=Host(`api.example.com`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.middlewares=auth,strip-api-prefix"
+      - "traefik.http.services.api.loadbalancer.server.port=5000"
+    environment:
+      DATABASE_URI: "postgres://postgres:password@db:5432"
+
+  admin-ui:
+    build: "./services/admin-ui"
+    labels:
+      - "traefik.enable=true"
+
+      # Verify authentication
+      - "traefik.http.middlewares.auth.forwardauth.address=http://authentication:80"
+      - "traefik.http.middlewares.auth.forwardauth.authResponseHeaders=x-user-id"
+
+      # Target router
+      - "traefik.http.routers.admin-ui.rule=Host(`admin.example.com`)"
+      - "traefik.http.routers.admin-ui.entrypoints=web"
+      - "traefik.http.routers.admin-ui.middlewares=auth"
+      - "traefik.http.services.admin-ui.loadbalancer.server.port=5000"
+
+  dashboard-ui:
+    build: "./services/dashboard-ui"
+    labels:
+      - "traefik.enable=true"
+
+      # Target router
+      - "traefik.http.routers.dashboard-ui.rule=Host(`example.com`)"
+      - "traefik.http.routers.dashboard-ui.entrypoints=web"
+      - "traefik.http.services.dashboard-ui.loadbalancer.server.port=5000"
+
+  authentication:
+    build: "./services/auth-server"
+    labels:
+      - "traefik.enable=true"
+
+      # Target router
+      - "traefik.http.routers.auth.rule=PathPrefix(`/callback`)"
+      - "traefik.http.routers.auth.entrypoints=web"
